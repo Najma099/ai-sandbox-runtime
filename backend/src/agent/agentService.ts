@@ -1,18 +1,9 @@
-import { PiClient } from "./PiClient";
+import { AgentLoop } from "./agentLoop";
 
 export class AgentService {
-    constructor(
-        private readonly piClient: PiClient
-    ){}
+  constructor(private readonly agentLoop: AgentLoop) {}
 
-    async chat(
-        sessionId: string,
-        message: string
-    ){
-        return this.piClient.runChat({
-            sessionId,
-            message
-        });
-    }
-
+  async chat(sessionId: string, message: string) {
+    return this.agentLoop.run(sessionId, message);
+  }
 }

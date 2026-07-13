@@ -1,5 +1,9 @@
-import { ChatInput, ChatResult } from "./types";
+import { ChatInput, ChatResult, ToolResult } from "./types";
 
 export interface PiClient {
-    runChat(input: ChatInput): Promise<ChatResult>
+  startChat(input: ChatInput): Promise<ChatResult>;
+  continueChat(input: {
+    sessionId: string;
+    toolResults: ToolResult[];
+  }): Promise<ChatResult>;
 }
