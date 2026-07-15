@@ -32,7 +32,7 @@ export class SandboxManager {
   constructor(options: SandboxManagerOptions = {}) {
     const count = options.count ?? 8;
     const provider = resolveProvider(options.provider);
-    const namespace = options.namespace ?? process.env.K8S_NAMESPACE ?? "default";
+    const namespace = options.namespace ?? process.env.K8S_NAMESPACE ?? "sandbox";
 
     for (let i = 0; i < count; i++) {
       const id = `sandbox-runner-${i}`;

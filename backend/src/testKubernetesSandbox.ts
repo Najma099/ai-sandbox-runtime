@@ -4,7 +4,7 @@ import { SandboxManager } from "./sandbox/SandboxManager";
 import { SandboxScheduler } from "./scheduler/SandboxScheduler";
 
 async function main() {
-  const namespace = process.env.K8S_NAMESPACE ?? "default";
+  const namespace = process.env.K8S_NAMESPACE ?? "sandbox";
   const pod = process.env.K8S_POD ?? "sandbox-runner-0";
 
   console.log(`Testing kubectl exec on pod ${pod} in namespace ${namespace}`);

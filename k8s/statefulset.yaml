@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sandbox-runner
+  namespace: sandbox
+spec:
+  serviceName: sandbox-runner
+  replicas: 8
+  selector:
+    matchLabels:
+      app: sandbox-runner
+  template:
+    metadata:
+      labels:
+        app: sandbox-runner
+    spec:
+      containers:
+        - name: runner
+          image: sandbox-runner:latest
+          imagePullPolicy: IfNotPresent
+          command: ["sleep", "infinity"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
