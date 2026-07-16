@@ -12,7 +12,7 @@ export class ToolExecutor {
 
     async execute(
         name:string,
-        args:Record<string,any>
+        args:Record<string, unknown>
     ){
         const tool = this.tools.get(name);
 

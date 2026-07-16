@@ -2,22 +2,11 @@ import Anthropic from "@anthropic-ai/sdk";
 import { PiClient } from "./PiClient";
 import { ChatInput, ChatResult } from "./types";
 
-const TOOLS: Anthropic.Messages.Tool[] = [
-  {
-    name: "env_inspect",
-    description: "Returns runtime information",
-    input_schema: {
-      type: "object",
-      properties: {},
-    },
-  },
-];
-
 export class RealPiClient implements PiClient {
   private client: Anthropic;
   private sessions = new Map<string, Anthropic.MessageParam[]>();
 
-  constructor() {
+  constructor(private readonly tools: Anthropic.Messages.Tool[]) {
     if (!process.env.ANTHROPIC_API_KEY) {
       throw new Error("Missing ANTHROPIC_API_KEY");
     }
@@ -80,7 +69,7 @@ export class RealPiClient implements PiClient {
     return this.client.messages.create({
       model: "claude-sonnet-5",
       max_tokens: 1024,
-      tools: TOOLS,
+      tools: this.tools,
       messages,
     });
   }
