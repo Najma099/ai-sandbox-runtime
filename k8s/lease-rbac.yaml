@@ -1,0 +1,29 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sandbox-lease-manager
+  namespace: sandbox
+rules:
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sandbox-lease-manager
+  namespace: sandbox
+subjects:
+  - kind: ServiceAccount
+    name: sandbox-api
+    namespace: sandbox
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: sandbox-lease-manager
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sandbox-api
+  namespace: sandbox

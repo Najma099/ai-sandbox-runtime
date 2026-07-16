@@ -33,6 +33,7 @@ echo "Applying Kubernetes manifests"
 kubectl apply -f "$ROOT_DIR/k8s/namespace.yaml"
 kubectl apply -f "$ROOT_DIR/k8s/service.yaml"
 kubectl apply -f "$ROOT_DIR/k8s/statefulset.yaml"
+kubectl apply -f "$ROOT_DIR/k8s/lease-rbac.yaml"
 
 echo "Waiting for sandbox pods"
 kubectl rollout status statefulset/sandbox-runner -n sandbox --timeout=180s

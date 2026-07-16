@@ -1,2 +1,3 @@
 export { Queue } from "./Queue";
-export { SandboxScheduler } from "./SandboxScheduler";
+export { SandboxScheduler, type SandboxSchedulerOptions } from "./SandboxScheduler";
+export { createSandboxScheduler } from "./createSandboxScheduler";

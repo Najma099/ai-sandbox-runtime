@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { KubernetesSandbox } from "./sandbox/KubernetesSandbox";
 import { SandboxManager } from "./sandbox/SandboxManager";
-import { SandboxScheduler } from "./scheduler/SandboxScheduler";
+import { createSandboxScheduler } from "./scheduler/createSandboxScheduler";
 
 async function main() {
   const namespace = process.env.K8S_NAMESPACE ?? "sandbox";
@@ -20,7 +20,8 @@ async function main() {
     namespace,
   });
 
-  const scheduler = new SandboxScheduler(manager.getSandboxes());
+  const scheduler = createSandboxScheduler(manager);
+  console.log("Scheduler uses leases:", scheduler.usesLeases());
   const scheduled = await scheduler.execute("node --version");
 
   console.log("Via scheduler:", scheduled);
