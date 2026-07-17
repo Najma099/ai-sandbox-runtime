@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, ChildProcess } from "node:child_process";
 import { Sandbox } from "./Sandbox";
 
 export class KubernetesSandbox implements Sandbox {
@@ -7,7 +7,10 @@ export class KubernetesSandbox implements Sandbox {
     private readonly namespace: string,
   ) {}
 
-  async execute(command: string): Promise<string> {
+  async execute(
+    command: string,
+    options?: { timeoutMs?: number },
+  ): Promise<string> {
     const trimmed = command.trim();
 
     if (!trimmed) {
@@ -18,6 +21,7 @@ export class KubernetesSandbox implements Sandbox {
       this.id,
       this.namespace,
       trimmed,
+      options?.timeoutMs,
     );
 
     if (exitCode !== 0) {
@@ -34,9 +38,13 @@ function kubectlExec(
   pod: string,
   namespace: string,
   command: string,
+  timeoutMs?: number,
 ): Promise<{ stdout: string; stderr: string; exitCode: number }> {
   return new Promise((resolve, reject) => {
-    const proc = spawn(
+    let proc: ChildProcess | undefined;
+    let timer: NodeJS.Timeout | undefined;
+
+    proc = spawn(
       "kubectl",
       ["exec", "-n", namespace, pod, "--", "sh", "-c", command],
       { stdio: ["ignore", "pipe", "pipe"] },
@@ -44,21 +52,53 @@ function kubectlExec(
 
     let stdout = "";
     let stderr = "";
+    let settled = false;
 
-    proc.stdout.on("data", (chunk: Buffer) => {
+    const finish = (result: { stdout: string; stderr: string; exitCode: number }) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      resolve(result);
+    };
+
+    const fail = (error: Error) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      proc?.kill("SIGKILL");
+      reject(error);
+    };
+
+    if (timeoutMs) {
+      timer = setTimeout(() => {
+        fail(new Error(`Execution timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+    }
+
+    proc.stdout?.on("data", (chunk: Buffer) => {
       stdout += chunk.toString();
     });
 
-    proc.stderr.on("data", (chunk: Buffer) => {
+    proc.stderr?.on("data", (chunk: Buffer) => {
       stderr += chunk.toString();
     });
 
     proc.on("error", (error) => {
-      reject(error);
+      fail(error);
     });
 
     proc.on("close", (exitCode) => {
-      resolve({
+      finish({
         stdout,
         stderr,
         exitCode: exitCode ?? 1,

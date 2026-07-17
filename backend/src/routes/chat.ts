@@ -2,24 +2,24 @@ import { Router } from "express";
 import { AgentService } from "../agent/agentService";
 import { RealPiClient } from "../agent/realPiClient";
 import { AgentLoop } from "../agent/agentLoop";
-import { createToolExecutor } from "../tools";
+import { AppDependencies } from "../tools";
 
-const router = Router();
+export function createChatRouter(deps: AppDependencies): Router {
+  const router = Router();
+  const piClient = new RealPiClient(deps.anthropicTools);
+  const agentLoop = new AgentLoop(piClient, deps.executor);
+  const agentService = new AgentService(agentLoop);
 
-const { executor: toolExecutor, anthropicTools } = createToolExecutor();
-const piClient = new RealPiClient(anthropicTools);
-const agentLoop = new AgentLoop(piClient, toolExecutor);
-const agentService = new AgentService(agentLoop);
+  router.post("/chat", async (req, res) => {
+    const { sessionId, message } = req.body;
 
-router.post("/chat", async (req, res) => {
-  const { sessionId, message } = req.body;
+    const result = await agentService.chat(sessionId, message);
 
-  const result = await agentService.chat(sessionId, message);
-
-  res.json({
-    sessionId,
-    ...result,
+    res.json({
+      sessionId,
+      ...result,
+    });
   });
-});
 
-export default router;
+  return router;
+}

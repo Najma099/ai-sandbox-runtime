@@ -6,3 +6,10 @@ export {
   type SandboxManagerOptions,
   type SandboxProvider,
 } from "./SandboxManager";
+export {
+  assertCommandAllowed,
+  buildCatCommand,
+  CommandNotAllowedError,
+  getAllowedCommandPatterns,
+} from "./commandPolicy";
+export { listSandboxPods, type PodStatus, type PodListResponse } from "./podStatus";

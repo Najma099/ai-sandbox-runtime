@@ -4,8 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "test:policy": "tsx src/testCommandPolicy.ts",
+    "test:scheduler": "tsx src/testScheduler.ts",
+    "test:stress": "tsx src/testStress.ts",
+    "test:lease": "tsx src/testLeaseManager.ts",
+    "test:k8s": "tsx src/testKubernetesSandbox.ts",
+    "test": "npm run test:policy && npm run test:scheduler && npm run test:stress"
   },
   "keywords": [],
   "author": "",
